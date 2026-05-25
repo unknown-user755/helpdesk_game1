@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Helpdesk Panic</title>
+
+<style>
+body{
+margin:0;
+overflow:hidden;
+background:#111;
+font-family:Arial;
+color:white;
+}
+
+#player{
+width:50px;
+height:50px;
+background:cyan;
+position:absolute;
+bottom:20px;
+left:50%;
+}
+
+.ticket{
+position:absolute;
+width:140px;
+height:40px;
+background:red;
+color:white;
+text-align:center;
+line-height:40px;
+border-radius:10px;
+font-size:12px;
+}
+
+#ui{
+position:absolute;
+top:10px;
+left:10px;
+z-index:10;
+}
+</style>
+</head>
+
+<body>
+
+<div id="ui">
+<h1>Helpdesk Panic</h1>
+<p>Puntos: <span id="score">0</span></p>
+<p>Vidas: <span id="lives">3</span></p>
+</div>
+
+<div id="player"></div>
+
+<script>
+const player=document.getElementById("player");
+const scoreText=document.getElementById("score");
+const livesText=document.getElementById("lives");
+
+let playerX=window.innerWidth/2;
+let score=0;
+let lives=3;
+let speed=3;
+
+const messages=[
+"¿Has reiniciado?",
+"La impresora no imprime",
+"URGENTE",
+"He borrado System32",
+"No funciona internet"
+];
+
+document.addEventListener("keydown",(e)=>{
+if(e.key==="ArrowLeft") playerX-=20;
+if(e.key==="ArrowRight") playerX+=20;
+
+player.style.left=playerX+"px";
+});
+
+function createTicket(){
+const ticket=document.createElement("div");
+
+ticket.classList.add("ticket");
+
+ticket.innerText=
+messages[Math.floor(Math.random()*messages.length)];
+
+ticket.style.left=
+Math.random()*(window.innerWidth-140)+"px";
+
+document.body.appendChild(ticket);
+
+let y=0;
+
+const fall=setInterval(()=>{
+
+y+=speed;
+
+ticket.style.top=y+"px";
+
+const t=ticket.getBoundingClientRect();
+const p=player.getBoundingClientRect();
+
+if(
+t.left<p.right &&
+t.right>p.left &&
+t.top<p.bottom &&
+t.bottom>p.top
+){
+lives--;
+livesText.innerText=lives;
+
+ticket.remove();
+
+clearInterval(fall);
+
+if(lives<=0){
+alert("DESPEDIDA DEL HELP DESK");
+location.reload();
+}
+}
+
+if(y>window.innerHeight){
+score++;
+scoreText.innerText=score;
+
+ticket.remove();
+
+clearInterval(fall);
+}
+
+},20);
+}
+
+setInterval(createTicket,1000);
+
+setInterval(()=>{
+speed+=1;
+},10000);
+</script>
+
+</body>
+</html>
